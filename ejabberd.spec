@@ -1,6 +1,6 @@
 Name:           ejabberd
 Version:        1.1.3
-Release:        %mkrel 1
+Release:        %mkrel 2
 Summary:        A distributed, fault-tolerant Jabber/XMPP server
 
 Group:          System/Servers
@@ -29,6 +29,7 @@ BuildRequires: openssl-devel
 BuildRequires: zlib-devel
 BuildRequires: tetex-latex hevea erlang-devel
 
+Requires:	erlang-base
 Requires(pre): rpm-helper
 #Requires: gencert.sh
 
@@ -41,7 +42,6 @@ Windows NT/2000/XP).
 %package doc
 Summary: Documentation for ejabberd
 Group: System/Servers
-Requires: hevea
 
 %description doc
 Documentation for ejabberd.
