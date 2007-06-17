@@ -1,37 +1,33 @@
-Name:           ejabberd
-Version:        1.1.3
-Release:        %mkrel 2
-Summary:        A distributed, fault-tolerant Jabber/XMPP server
-
-Group:          System/Servers
-License:        GPL
-URL:            http://ejabberd.jabber.ru/
-Source0:        http://www.process-one.net/en/projects/ejabberd/download/%{version}/ejabberd-%{version}.tar.bz2
+Summary:	A distributed, fault-tolerant Jabber/XMPP server
+Name:		ejabberd
+Version:	1.1.3
+Release:        %mkrel 4
+Group:		System/Servers
+License:	GPL
+URL:		http://ejabberd.jabber.ru/
+Source0:	http://www.process-one.net/en/projects/ejabberd/download/%{version}/ejabberd-%{version}.tar.bz2
 Source1:	ejabberd.init
 Source2:	ejabberd.logrotate
 Source3:	inetrc
 
 # http://ejabberd.jabber.ru/ejabberdctl-extra
-Source4:        http://ejabberd.jabber.ru/files/efiles/mod_ctlextra.erl
+Source4:	http://ejabberd.jabber.ru/files/efiles/mod_ctlextra.erl
 
 # The following were extracted from a patch found on http://realloc.spb.ru/share/ejabberdad.html
-Source5:        ejabberd_auth_ad.erl
-Source6:        mod_shared_roster_ad.erl
-Source7:        mod_vcard_ad.erl
+Source5:	ejabberd_auth_ad.erl
+Source6:	mod_shared_roster_ad.erl
+Source7:	mod_vcard_ad.erl
 Source8:	gencert.sh
 Source9:	ejabberd.README.urpmi
-
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-buildroot
-
-BuildRequires: erlang-stack
-BuildRequires: libexpat-devel
-BuildRequires: openssl-devel
-BuildRequires: zlib-devel
-BuildRequires: tetex-latex hevea erlang-devel
-
+BuildRequires:	erlang-stack
+BuildRequires:	libexpat-devel
+BuildRequires:	openssl-devel
+BuildRequires:	zlib-devel
+BuildRequires:	tetex-latex hevea erlang-devel
 Requires:	erlang-base
-Requires(pre): rpm-helper
-#Requires: gencert.sh
+Requires(pre):	rpm-helper
+#Requires:	gencert.sh
+BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
 ejabberd is a Free and Open Source distributed fault-tolerant
@@ -40,15 +36,14 @@ platforms (tested on Linux, FreeBSD, NetBSD, Solaris, Mac OS X and
 Windows NT/2000/XP).
 
 %package doc
-Summary: Documentation for ejabberd
-Group: System/Servers
+Summary:	Documentation for ejabberd
+Group:		System/Servers
 
 %description doc
 Documentation for ejabberd.
 
 %pre
 %_pre_useradd ejabberd /var/lib/ejabberd /sbin/nologin
-
 
 %preun
 %_preun_service ejabberd
@@ -70,7 +65,8 @@ cp %{SOURCE7} src
 
 %build
 pushd src
-%configure2_5x --enable-odbc
+%configure2_5x \
+	--enable-odbc
 %make
 popd
 pushd doc
@@ -170,5 +166,3 @@ rm -rf %{buildroot}
 %files doc
 %defattr(-,root,root,-)
 %doc ChangeLog COPYING TODO doc/*.pdf doc/*.html doc/*.png doc/release_notes_*
-
-
