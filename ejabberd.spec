@@ -43,7 +43,7 @@ Group:		System/Servers
 Documentation for ejabberd.
 
 %pre
-%_pre_useradd ejabberd /var/lib/ejabberd /sbin/nologin
+%_pre_useradd ejabberd /var/lib/ejabberd /bin/sh
 
 %preun
 %_preun_service ejabberd
