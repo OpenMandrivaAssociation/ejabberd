@@ -159,6 +159,10 @@ ERLANG_NODE=ejabberd
 ERL=/usr/bin/erl
 LIB=%{_libdir}/ejabberd-%{version}/ebin
 
+f [ -r /var/lib/ejabberd/.erlang.cookie ] ; then
+    export HOME=/var/lib/ejabberd
+fi
+
 if [ $# -ne 0 ] ; then
     case $1 in
 	--node) shift ; ERLANG_NODE=$1 ; shift ;;
@@ -190,6 +194,10 @@ INETRC=/etc/ejabberd/inetrc
 LOG=/var/log/ejabberd/ejabberd.log
 SASL_LOG=/var/log/ejabberd/sasl.log
 SPOOL=/var/lib/ejabberd
+
+f [ -r /var/lib/ejabberd/.erlang.cookie ] ; then
+    export HOME=/var/lib/ejabberd
+fi
 
 ARGS=
 while [ $# -ne 0 ] ; do
