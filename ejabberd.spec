@@ -24,6 +24,8 @@ BuildRequires:	zlib-devel
 BuildRequires:	tetex-latex
 BuildRequires:	hevea
 Requires:	    erlang-base
+Requires:	    erlang-crypto
+Requires:	    erlang-mnesia
 Requires(pre):	rpm-helper
 BuildRoot:	    %{_tmppath}/%{name}-%{version}
 
