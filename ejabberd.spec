@@ -7,7 +7,6 @@ License:	GPL
 URL:		http://ejabberd.jabber.ru/
 Source0:	http://www.process-one.net/en/projects/ejabberd/download/%{version}/ejabberd-%{version}.tar.bz2
 Source1:	ejabberd.init
-Source2:	ejabberd.logrotate
 Source3:	inetrc
 
 # http://ejabberd.jabber.ru/ejabberdctl-extra
@@ -86,15 +85,21 @@ chmod a+x %{buildroot}%{_libdir}/ejabberd-%{version}/priv/lib/*.so
 mkdir -p %{buildroot}/var/log/ejabberd
 mkdir -p %{buildroot}/var/lib/ejabberd/spool
 
-mkdir -p %{buildroot}%{_initrddir}
-cp %{S:1} %{buildroot}%{_initrddir}/ejabberd
-chmod a+x %{buildroot}%{_initrddir}/ejabberd
+install -d -m 755  %{buildroot}%{_initrddir}
+install -m 755 %{SOURCE1} %{buildroot}%{_initrddir}/ejabberd
 
-mkdir -p %{buildroot}%{_sysconfdir}/logrotate.d
-cp %{S:2} %{buildroot}%{_sysconfdir}/logrotate.d/ejabberd
-
-%{__perl} -pi -e 's!\@libdir\@!%{_libdir}!g' %{buildroot}%{_initrddir}/ejabberd %{buildroot}%{_sysconfdir}/logrotate.d/ejabberd
-%{__perl} -pi -e 's!\@version\@!%{version}!g' %{buildroot}%{_initrddir}/ejabberd %{buildroot}%{_sysconfdir}/logrotate.d/ejabberd
+install -d -m 755 %{buildroot}%{_sysconfdir}/logrotate.d
+cat > %{buildroot}%{_sysconfdir}/logrotate.d/%{name} <<'EOF'
+/var/log/ejabberd/*.log {
+    missingok
+    notifempty
+    create 0640 ejabberd ejabberd
+    sharedscripts
+    postrotate
+        runuser ejabberd -c "ejabberdctl --node ejabberd@`hostname -s` reopen-log >/dev/null 2>&1 || true
+    endscript
+}
+EOF
 
 cp %{S:3} %{buildroot}%{_sysconfdir}/ejabberd/inetrc
 
