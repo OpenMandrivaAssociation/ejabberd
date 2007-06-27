@@ -42,18 +42,6 @@ Group:		System/Servers
 %description doc
 Documentation for ejabberd.
 
-%pre
-if [ -d %{_localstatedir}/%{name}/spool ]; then
-    mv -f %{_localstatedir}/%{name}/spool/* %{_localstatedir}/%{name}
-    rmdir %{_localstatedir}/%{name}/spool
-fi
-%_pre_useradd ejabberd /var/lib/ejabberd /bin/sh
-
-%preun
-%_preun_service ejabberd
-
-%postun
-%_postun_userdel ejabberd
 
 %prep
 %setup -q
@@ -89,6 +77,7 @@ chmod a+x %{buildroot}%{_libdir}/ejabberd-%{version}/priv/lib/*.so
     %{buildroot}/etc/ejabberd/ejabberd.cfg
 
 install -d -m 755 %{buildroot}/var/log/ejabberd
+install -d -m 755 %{buildroot}%{_localstatedir}/ejabberd
 
 install -d -m 755  %{buildroot}%{_initrddir}
 install -m 755 %{SOURCE1} %{buildroot}%{_initrddir}/ejabberd
@@ -137,6 +126,7 @@ install -m 644 ChangeLog %{buildroot}%{_docdir}/%{name}
 install -m 644 COPYING %{buildroot}%{_docdir}/%{name}
 install -m 644 doc/*.pdf doc/*.html doc/*.png doc/release_notes_*  %{buildroot}%{_docdir}/%{name}
 
+# ssl stuff
 cat > ejabberd.cnf <<'EOF'
 default_bits            = 1024
 encrypt_key             = no
@@ -156,7 +146,7 @@ EOF
 install -d -m 755 %{buildroot}%{_sysconfdir}/pki/tls
 install -m 644 ejabberd.cnf %{buildroot}%{_sysconfdir}/pki/tls
 
-# wrapper
+# wrappers
 cat > ejabberdctl <<'EOF'
 #!/bin/sh
 
@@ -239,6 +229,16 @@ install -d -m 755 %{buildroot}%{_sbindir}
 install -m 755 ejabberd %{buildroot}%{_sbindir}
 install -m 755 ejabberdctl %{buildroot}%{_sbindir}
 
+%pre
+if [ -d %{_localstatedir}/%{name}/spool ]; then
+    mv -f %{_localstatedir}/%{name}/spool/* %{_localstatedir}/%{name}
+    rmdir %{_localstatedir}/%{name}/spool
+fi
+%_pre_useradd ejabberd /var/lib/ejabberd /bin/sh
+
+%preun
+%_preun_service ejabberd
+
 %post
 # generate SSL cert if needed
 if [ $1 = 1 ]; then
@@ -257,6 +257,9 @@ if [ $1 = 1 ]; then
 fi
 
 %_post_service ejabberd
+
+%postun
+%_postun_userdel ejabberd
 
 %clean
 rm -rf %{buildroot}
