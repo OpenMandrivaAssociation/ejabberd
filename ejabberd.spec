@@ -82,8 +82,7 @@ chmod a+x %{buildroot}%{_libdir}/ejabberd-%{version}/priv/lib/*.so
 %{__perl} -pi -e 's!./ssl.pem!/etc/pki/tls/private/ejabberd.pem!g' \
     %{buildroot}/etc/ejabberd/ejabberd.cfg
 
-mkdir -p %{buildroot}/var/log/ejabberd
-mkdir -p %{buildroot}/var/lib/ejabberd/spool
+install -d -m 755 %{buildroot}/var/log/ejabberd
 
 install -d -m 755  %{buildroot}%{_initrddir}
 install -m 755 %{SOURCE1} %{buildroot}%{_initrddir}/ejabberd
@@ -159,7 +158,7 @@ ERLANG_NODE=ejabberd
 ERL=/usr/bin/erl
 LIB=%{_libdir}/ejabberd-%{version}/ebin
 
-f [ -r /var/lib/ejabberd/.erlang.cookie ] ; then
+if [ -r /var/lib/ejabberd/.erlang.cookie ] ; then
     export HOME=/var/lib/ejabberd
 fi
 
@@ -195,7 +194,7 @@ LOG=/var/log/ejabberd/ejabberd.log
 SASL_LOG=/var/log/ejabberd/sasl.log
 SPOOL=/var/lib/ejabberd
 
-f [ -r /var/lib/ejabberd/.erlang.cookie ] ; then
+if [ -r /var/lib/ejabberd/.erlang.cookie ] ; then
     export HOME=/var/lib/ejabberd
 fi
 
