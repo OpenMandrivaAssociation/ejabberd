@@ -43,6 +43,10 @@ Group:		System/Servers
 Documentation for ejabberd.
 
 %pre
+if [ -d %{_localstatedir}/%{name}/spool ]; then
+    mv -f %{_localstatedir}/%{name}/spool/* %{_localstatedir}/%{name}
+    rmdir %{_localstatedir}/%{name}/spool
+fi
 %_pre_useradd ejabberd /var/lib/ejabberd /bin/sh
 
 %preun
