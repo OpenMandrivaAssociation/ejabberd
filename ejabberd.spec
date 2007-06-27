@@ -237,6 +237,8 @@ install -m 755 ejabberdctl %{buildroot}%{_sbindir}
 %post
 # generate SSL cert if needed
 if [ $1 = 1 ]; then
+    # force environment
+    export HOSTNAME=$(hostname)
     openssl req -new -x509 -days 365 \
         -config %{_sysconfdir}/pki/tls/ejabberd.cnf \
         -keyout %{_sysconfdir}/pki/tls/private/ejabberd.pem \
