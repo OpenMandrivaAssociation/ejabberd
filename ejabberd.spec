@@ -152,7 +152,7 @@ cat > ejabberdctl <<'EOF'
 
 ERLANG_NODE=ejabberd
 ERL=/usr/bin/erl
-EJABBERD_HOME=%{_libdir}/ejabberd-%{version}
+LIB=%{_libdir}/ejabberd-%{version}/ebin
 
 if [ $# -ne 0 ] ; then
     case $1 in
@@ -166,8 +166,7 @@ else
     SNAME=-name
 fi
 
-exec $ERL \
-    -pa $EJABBERD_HOME/ebin \
+exec $ERL -pa $LIB \
     $SNAME ejabberdctl \
     -s ejabberd_ctl \
     -noinput \
@@ -175,7 +174,51 @@ exec $ERL \
     "$@"
 EOF
 
+cat > ejabberd <<'EOF'
+#!/bin/sh
+
+ERLANG_NODE=ejabberd
+ERL=/usr/bin/erl
+LIB=%{_libdir}/ejabberd-%{version}/ebin
+CONFIG=/etc/ejabberd/ejabberd.cfg
+INETRC=/etc/ejabberd/inetrc
+LOG=/var/log/ejabberd/ejabberd.log
+SASL_LOG=/var/log/ejabberd/sasl.log
+SPOOL=/var/lib/ejabberd
+
+ARGS=
+while [ $# -ne 0 ] ; do
+    PARAM=$1
+    shift
+    case $PARAM in
+	--) break ;;
+	--node) ERLANG_NODE=$1; shift ;;
+	--config) CONFIG=$1 ; shift ;;
+	--log) LOG=$1 ; shift ;;
+	--sasl-log) SASL_LOG=$1 ; shift ;;
+	--spool) SPOOL=$1 ; shift ;;
+	*) ARGS="$ARGS $PARAM" ;;
+    esac
+done
+
+if [ "$ERLANG_NODE" = "${ERLANG_NODE%.*}" ] ; then
+    SNAME=-sname
+else
+    SNAME=-name
+fi
+
+exec $ERL -pa $LIB \
+    $SNAME $ERLANG_NODE \
+    -s ejabberd \
+    -kernel inetrc \"$INETRC\" \
+    -ejabberd config \"$CONFIG\" log_path \"$LOG\" \
+    -sasl sasl_error_logger \{file,\"$SASL_LOG\"\} \
+    -mnesia dir \"$SPOOL\" \
+    $ERL_OPTIONS $ARGS "$@"
+EOF
+
 install -d -m 755 %{buildroot}%{_sbindir}
+install -m 755 ejabberd %{buildroot}%{_sbindir}
 install -m 755 ejabberdctl %{buildroot}%{_sbindir}
 
 %post
@@ -209,6 +252,7 @@ rm -rf %{buildroot}
 %attr(640,root,ejabberd) %config(noreplace) %{_sysconfdir}/ejabberd/ejabberd.cfg
 %config(noreplace) %{_sysconfdir}/ejabberd/inetrc
 %{_initrddir}/ejabberd
+%{_sbindir}/ejabberd
 %{_sbindir}/ejabberdctl
 %config(noreplace) %{_sysconfdir}/logrotate.d/ejabberd
 %config(noreplace) %{_sysconfdir}/pki/tls/ejabberd.cnf
