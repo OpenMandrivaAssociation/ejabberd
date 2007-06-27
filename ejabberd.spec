@@ -17,7 +17,6 @@ Source4:	http://ejabberd.jabber.ru/files/efiles/mod_ctlextra.erl
 Source5:	ejabberd_auth_ad.erl
 Source6:	mod_shared_roster_ad.erl
 Source7:	mod_vcard_ad.erl
-Source8:	gencert.sh
 BuildRequires:	erlang-stack
 BuildRequires:	erlang-devel
 BuildRequires:	libexpat-devel
@@ -81,7 +80,8 @@ popd
 
 chmod a+x %{buildroot}%{_libdir}/ejabberd-%{version}/priv/lib/*.so
 
-%{__perl} -pi -e 's!./ssl.pem!/etc/ssl/ejabberd/ejabberd.pem!g' %{buildroot}/etc/ejabberd/ejabberd.cfg
+%{__perl} -pi -e 's!./ssl.pem!/etc/pki/tls/private/ejabberd.pem!g' \
+    %{buildroot}/etc/ejabberd/ejabberd.cfg
 
 mkdir -p %{buildroot}/var/log/ejabberd
 mkdir -p %{buildroot}/var/lib/ejabberd/spool
@@ -97,11 +97,6 @@ cp %{S:2} %{buildroot}%{_sysconfdir}/logrotate.d/ejabberd
 %{__perl} -pi -e 's!\@version\@!%{version}!g' %{buildroot}%{_initrddir}/ejabberd %{buildroot}%{_sysconfdir}/logrotate.d/ejabberd
 
 cp %{S:3} %{buildroot}%{_sysconfdir}/ejabberd/inetrc
-
-mkdir -p %{buildroot}/%{_datadir}/%{name}
-install -m 755 %{SOURCE8} %{buildroot}/%{_datadir}/%{name}
-
-mkdir -p %{buildroot}/%{_sysconfdir}/ssl/%{name}
 
 cat > README.urpmi <<EOF
 Mandriva RPM specific notes
@@ -135,22 +130,38 @@ install -m 644 ChangeLog %{buildroot}%{_docdir}/%{name}
 install -m 644 COPYING %{buildroot}%{_docdir}/%{name}
 install -m 644 doc/*.pdf doc/*.html doc/*.png doc/release_notes_*  %{buildroot}%{_docdir}/%{name}
 
-%post
+cat > ejabberd.cnf <<'EOF'
+default_bits            = 1024
+encrypt_key             = no
+prompt                  = no
+distinguished_name      = req_dn
+req_extensions          = req_ext
 
-mkdir -p %{_sysconfdir}/ssl/%{name}
-# generate the ejabberd.pem cert here instead of the initscript                                                                                                                                                                                  
-if [ ! -e %{_sysconfdir}/ssl/%{name}/ejabberd.pem ] ; then
-  if [ -x %{_datadir}/%{name}/gencert.sh ] ; then
-    echo "Generating self-signed certificate..."
-    pushd %{_sysconfdir}/ssl/%{name}/ > /dev/null
-    yes ""|%{_datadir}/%{name}/gencert.sh >/dev/null 2>&1
-    chmod 640 ejabberd.pem
-    chown root:ejabberd ejabberd.pem
-    popd > /dev/null
-  fi
-  echo "To re-generate a self-signed certificate, you can use the utility"
-  echo "%{_datadir}/%{name}/gencert.sh..."
-  echo "(Do it at least once for having the right information in  %{_sysconfdir}/ssl/%{name}/"
+[ req_dn ]
+commonName              = $ENV::HOSTNAME
+organizationalUnitName  = default cert for $ENV::HOSTNAME
+emailAddress            = root@$ENV::HOSTNAME
+
+[ req_ext ]
+basicConstraints        = CA:FALSE
+EOF
+
+install -d -m 755 %{buildroot}%{_sysconfdir}/pki/tls
+install -m 644 ejabberd.cnf %{buildroot}%{_sysconfdir}/pki/tls
+
+%post
+# generate SSL cert if needed
+if [ $1 = 1 ]; then
+    openssl req -new -x509 -days 365 \
+        -config %{_sysconfdir}/pki/tls/ejabberd.cnf \
+        -keyout %{_sysconfdir}/pki/tls/private/ejabberd.pem \
+        -out %{_sysconfdir}/pki/tls/certs/ejabberd.pem
+    # ejabberd requires cert and key in the same file
+    cat %{_sysconfdir}/pki/tls/certs/ejabberd.pem \
+        >> %{_sysconfdir}/pki/tls/private/ejabberd.pem
+    # enforce strict perms
+    chmod 640 %{_sysconfdir}/pki/tls/private/ejabberd.pem
+    chgrp ejabberd %{_sysconfdir}/pki/tls/private/ejabberd.pem
 fi
 
 %_post_service ejabberd
@@ -170,10 +181,10 @@ rm -rf %{buildroot}
 %config(noreplace) %{_sysconfdir}/ejabberd/inetrc
 %{_initrddir}/ejabberd
 %config(noreplace) %{_sysconfdir}/logrotate.d/ejabberd
+%config(noreplace) %{_sysconfdir}/pki/tls/ejabberd.cnf
 %{_libdir}/ejabberd-%{version}
 %attr(-,ejabberd,ejabberd) /var/lib/ejabberd
 %attr(-,ejabberd,ejabberd) /var/log/ejabberd
-%{_datadir}/%{name}/gencert.sh
 
 %files doc
 %defattr(-,root,root)
