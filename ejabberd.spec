@@ -18,7 +18,6 @@ Source5:	ejabberd_auth_ad.erl
 Source6:	mod_shared_roster_ad.erl
 Source7:	mod_vcard_ad.erl
 Source8:	gencert.sh
-Source9:	ejabberd.README.urpmi
 BuildRequires:	erlang-stack
 BuildRequires:	erlang-devel
 BuildRequires:	libexpat-devel
@@ -101,10 +100,40 @@ cp %{S:3} %{buildroot}%{_sysconfdir}/ejabberd/inetrc
 
 mkdir -p %{buildroot}/%{_datadir}/%{name}
 install -m 755 %{SOURCE8} %{buildroot}/%{_datadir}/%{name}
-install -m 644 %{SOURCE9} %{buildroot}/%{_datadir}/%{name}/
 
 mkdir -p %{buildroot}/%{_sysconfdir}/ssl/%{name}
 
+cat > README.urpmi <<EOF
+Mandriva RPM specific notes
+
+Post-installation
+-----------------
+There is no users created with the default configuration.
+
+You have to first create an user, either through a client supporting registration (kopete, psi), or through command line:
+
+$> su ejabberd -c 'erl -pa /usr/lib/ejabberd-%{version}/ebin -noinput -sname \
+$> ejabberdctl -s ejabberd_ctl -extra ejabberd@host register foo domain.com \
+$> myadminpass'
+
+Then you have to grant him admin privilege, by adding such a line in /etc/ejabberd/ejabberd.cfg:
+
+{acl, admin, {user, "foo"}}.
+
+More commands are available, through ejabberctl:
+
+$> su ejabberd -c 'erl -pa /usr/lib/ejabberd-%{version}/ebin -noinput -sname \
+$> ejabberdctl -s ejabberd_ctl -extra ejabberd@host help'
+
+You can also access the web console at http://host:5280/admin
+EOF
+
+install -d -m 755 %{buildroot}%{_docdir}/%{name}
+install -m 644 README.urpmi %{buildroot}%{_docdir}/%{name}
+install -m 644 TODO %{buildroot}%{_docdir}/%{name}
+install -m 644 ChangeLog %{buildroot}%{_docdir}/%{name}
+install -m 644 COPYING %{buildroot}%{_docdir}/%{name}
+install -m 644 doc/*.pdf doc/*.html doc/*.png doc/release_notes_*  %{buildroot}%{_docdir}/%{name}
 
 %post
 
@@ -131,8 +160,11 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root)
-%doc COPYING
-%doc %{_datadir}/%{name}/ejabberd.README.urpmi
+%dir %{_docdir}/%{name}
+%{_docdir}/%{name}/COPYING
+%{_docdir}/%{name}/ChangeLog
+%{_docdir}/%{name}/TODO
+%{_docdir}/%{name}/README.urpmi
 %dir %{_sysconfdir}/ejabberd
 %attr(640,root,ejabberd) %config(noreplace) %{_sysconfdir}/ejabberd/ejabberd.cfg
 %config(noreplace) %{_sysconfdir}/ejabberd/inetrc
@@ -145,4 +177,8 @@ rm -rf %{buildroot}
 
 %files doc
 %defattr(-,root,root)
-%doc ChangeLog COPYING TODO doc/*.pdf doc/*.html doc/*.png doc/release_notes_*
+%{_docdir}/%{name}
+%exclude %{_docdir}/%{name}/COPYING
+%exclude %{_docdir}/%{name}/ChangeLog
+%exclude %{_docdir}/%{name}/TODO
+%exclude %{_docdir}/%{name}/README.urpmi
