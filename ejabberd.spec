@@ -1,7 +1,7 @@
-Summary:	A distributed, fault-tolerant Jabber/XMPP server
 Name:		ejabberd
 Version:	1.1.3
-Release:        %mkrel 4
+Release:    %mkrel 4
+Summary:	A distributed, fault-tolerant Jabber/XMPP server
 Group:		System/Servers
 License:	GPL
 URL:		http://ejabberd.jabber.ru/
@@ -20,14 +20,15 @@ Source7:	mod_vcard_ad.erl
 Source8:	gencert.sh
 Source9:	ejabberd.README.urpmi
 BuildRequires:	erlang-stack
+BuildRequires:	erlang-devel
 BuildRequires:	libexpat-devel
 BuildRequires:	openssl-devel
 BuildRequires:	zlib-devel
-BuildRequires:	tetex-latex hevea erlang-devel
-Requires:	erlang-base
+BuildRequires:	tetex-latex
+BuildRequires:	hevea
+Requires:	    erlang-base
 Requires(pre):	rpm-helper
-#Requires:	gencert.sh
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
+BuildRoot:	    %{_tmppath}/%{name}-%{version}
 
 %description
 ejabberd is a Free and Open Source distributed fault-tolerant
@@ -75,9 +76,8 @@ popd
 
 %install
 rm -rf %{buildroot}
-
 pushd src
-make install DESTDIR=%{buildroot}
+%makeinstall_std
 popd
 
 chmod a+x %{buildroot}%{_libdir}/ejabberd-%{version}/priv/lib/*.so
@@ -133,36 +133,16 @@ rm -rf %{buildroot}
 %defattr(-,root,root)
 %doc COPYING
 %doc %{_datadir}/%{name}/ejabberd.README.urpmi
-
-%attr(750,ejabberd,ejabberd) %dir %{_sysconfdir}/ejabberd
-%attr(640,ejabberd,ejabberd) %config(noreplace) %{_sysconfdir}/ejabberd/ejabberd.cfg
-%attr(640,ejabberd,ejabberd) %config(noreplace) %{_sysconfdir}/ejabberd/inetrc
-
-#%attr(640,root,ejabberd) %{_sysconfdir}/ssl/%{name}/%{name}.pem
-
+%dir %{_sysconfdir}/ejabberd
+%attr(640,root,ejabberd) %config(noreplace) %{_sysconfdir}/ejabberd/ejabberd.cfg
+%config(noreplace) %{_sysconfdir}/ejabberd/inetrc
 %{_initrddir}/ejabberd
 %config(noreplace) %{_sysconfdir}/logrotate.d/ejabberd
-
-%dir %{_libdir}/ejabberd-%{version}
-%dir %{_libdir}/ejabberd-%{version}/ebin
-%{_libdir}/ejabberd-%{version}/ebin/*.app
-%{_libdir}/ejabberd-%{version}/ebin/*.beam
-
-%dir %{_libdir}/ejabberd-%{version}/priv
-
-%dir %{_libdir}/ejabberd-%{version}/priv/lib
-%{_libdir}/ejabberd-%{version}/priv/lib/*.so
-
-%dir %{_libdir}/ejabberd-%{version}/priv/msgs
-%{_libdir}/ejabberd-%{version}/priv/msgs/*.msg
-
-%attr(750,ejabberd,ejabberd) %dir /var/lib/ejabberd
-%attr(750,ejabberd,ejabberd) %dir /var/lib/ejabberd/spool
-
-%attr(750,ejabberd,ejabberd) %dir /var/log/ejabberd
-
+%{_libdir}/ejabberd-%{version}
+%attr(-,ejabberd,ejabberd) /var/lib/ejabberd
+%attr(-,ejabberd,ejabberd) /var/log/ejabberd
 %{_datadir}/%{name}/gencert.sh
 
 %files doc
-%defattr(-,root,root,-)
+%defattr(-,root,root)
 %doc ChangeLog COPYING TODO doc/*.pdf doc/*.html doc/*.png doc/release_notes_*
