@@ -107,18 +107,15 @@ There is no users created with the default configuration.
 
 You have to first create an user, either through a client supporting registration (kopete, psi), or through command line:
 
-$> su ejabberd -c 'erl -pa /usr/lib/ejabberd-%{version}/ebin -noinput -sname \
-$> ejabberdctl -s ejabberd_ctl -extra ejabberd@host register foo domain.com \
-$> myadminpass'
+$> su ejabberd -c 'ejabberdctl --node ejabberd@host register user domain.tld passwd'
 
 Then you have to grant him admin privilege, by adding such a line in /etc/ejabberd/ejabberd.cfg:
 
-{acl, admin, {user, "foo"}}.
+{acl, admin, {user, "user"}}.
 
 More commands are available, through ejabberctl:
 
-$> su ejabberd -c 'erl -pa /usr/lib/ejabberd-%{version}/ebin -noinput -sname \
-$> ejabberdctl -s ejabberd_ctl -extra ejabberd@host help'
+$> su ejabberd -c 'ejabberdctl --node ejabberd@host help'
 
 You can also access the web console at http://host:5280/admin
 EOF
@@ -148,6 +145,38 @@ EOF
 
 install -d -m 755 %{buildroot}%{_sysconfdir}/pki/tls
 install -m 644 ejabberd.cnf %{buildroot}%{_sysconfdir}/pki/tls
+
+# wrapper
+cat > ejabberdctl <<'EOF'
+#!/bin/sh
+
+ERLANG_NODE=ejabberd
+ERL=/usr/bin/erl
+EJABBERD_HOME=%{_libdir}/ejabberd-%{version}
+
+if [ $# -ne 0 ] ; then
+    case $1 in
+	--node) shift ; ERLANG_NODE=$1 ; shift ;;
+    esac
+fi
+
+if [ "$ERLANG_NODE" = "${ERLANG_NODE%.*}" ] ; then
+    SNAME=-sname
+else
+    SNAME=-name
+fi
+
+exec $ERL \
+    -pa $EJABBERD_HOME/ebin \
+    $SNAME ejabberdctl \
+    -s ejabberd_ctl \
+    -noinput \
+    -extra $ERLANG_NODE \
+    "$@"
+EOF
+
+install -d -m 755 %{buildroot}%{_sbindir}
+install -m 755 ejabberdctl %{buildroot}%{_sbindir}
 
 %post
 # generate SSL cert if needed
@@ -180,6 +209,7 @@ rm -rf %{buildroot}
 %attr(640,root,ejabberd) %config(noreplace) %{_sysconfdir}/ejabberd/ejabberd.cfg
 %config(noreplace) %{_sysconfdir}/ejabberd/inetrc
 %{_initrddir}/ejabberd
+%{_sbindir}/ejabberdctl
 %config(noreplace) %{_sysconfdir}/logrotate.d/ejabberd
 %config(noreplace) %{_sysconfdir}/pki/tls/ejabberd.cnf
 %{_libdir}/ejabberd-%{version}
