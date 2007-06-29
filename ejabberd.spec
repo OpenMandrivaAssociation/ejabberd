@@ -1,6 +1,6 @@
 Name:		ejabberd
 Version:	1.1.3
-Release:    %mkrel 5
+Release:    %mkrel 6
 Summary:	A distributed, fault-tolerant Jabber/XMPP server
 Group:		System/Servers
 License:	GPL
@@ -23,10 +23,14 @@ BuildRequires:	openssl-devel
 BuildRequires:	zlib-devel
 BuildRequires:	tetex-latex
 BuildRequires:	hevea
+BuildRequires:  rpm-helper >= 0.19
 Requires:	    erlang-base
 Requires:	    erlang-crypto
 Requires:	    erlang-mnesia
-Requires(pre):	rpm-helper
+Requires(pre):	rpm-helper >= 0.19
+Requires(post):	rpm-helper >= 0.19
+Requires(preun):	rpm-helper >= 0.19
+Requires(postun):	rpm-helper >= 0.19
 BuildRoot:	    %{_tmppath}/%{name}-%{version}
 
 %description
@@ -126,26 +130,6 @@ install -m 644 ChangeLog %{buildroot}%{_docdir}/%{name}
 install -m 644 COPYING %{buildroot}%{_docdir}/%{name}
 install -m 644 doc/*.pdf doc/*.html doc/*.png doc/release_notes_*  %{buildroot}%{_docdir}/%{name}
 
-# ssl stuff
-cat > ejabberd.cnf <<'EOF'
-default_bits            = 1024
-encrypt_key             = no
-prompt                  = no
-distinguished_name      = req_dn
-req_extensions          = req_ext
-
-[ req_dn ]
-commonName              = $ENV::HOSTNAME
-organizationalUnitName  = default cert for $ENV::HOSTNAME
-emailAddress            = root@$ENV::HOSTNAME
-
-[ req_ext ]
-basicConstraints        = CA:FALSE
-EOF
-
-install -d -m 755 %{buildroot}%{_sysconfdir}/pki/tls
-install -m 644 ejabberd.cnf %{buildroot}%{_sysconfdir}/pki/tls
-
 # wrappers
 cat > ejabberdctl <<'EOF'
 #!/bin/sh
@@ -240,22 +224,7 @@ fi
 %_preun_service ejabberd
 
 %post
-# generate SSL cert if needed
-if [ $1 = 1 ]; then
-    # force environment
-    export HOSTNAME=$(hostname)
-    openssl req -new -x509 -days 365 \
-        -config %{_sysconfdir}/pki/tls/ejabberd.cnf \
-        -keyout %{_sysconfdir}/pki/tls/private/ejabberd.pem \
-        -out %{_sysconfdir}/pki/tls/certs/ejabberd.pem
-    # ejabberd requires cert and key in the same file
-    cat %{_sysconfdir}/pki/tls/certs/ejabberd.pem \
-        >> %{_sysconfdir}/pki/tls/private/ejabberd.pem
-    # enforce strict perms
-    chmod 640 %{_sysconfdir}/pki/tls/private/ejabberd.pem
-    chgrp ejabberd %{_sysconfdir}/pki/tls/private/ejabberd.pem
-fi
-
+%create_ssl_certificate ejabberd  true ejabberd
 %_post_service ejabberd
 
 %postun
@@ -278,7 +247,6 @@ rm -rf %{buildroot}
 %{_sbindir}/ejabberd
 %{_sbindir}/ejabberdctl
 %config(noreplace) %{_sysconfdir}/logrotate.d/ejabberd
-%config(noreplace) %{_sysconfdir}/pki/tls/ejabberd.cnf
 %{_libdir}/ejabberd-%{version}
 %attr(-,ejabberd,ejabberd) /var/lib/ejabberd
 %attr(-,ejabberd,ejabberd) /var/log/ejabberd
