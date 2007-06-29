@@ -63,7 +63,7 @@ cp %{SOURCE7} src
 pushd src
 %configure2_5x \
 	--enable-odbc
-%make
+make
 popd
 pushd doc
 make html pdf
