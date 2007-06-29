@@ -8,14 +8,14 @@ URL:		http://ejabberd.jabber.ru/
 Source0:	http://www.process-one.net/en/projects/ejabberd/download/%{version}/ejabberd-%{version}.tar.bz2
 Source1:	ejabberd.init
 Source3:	inetrc
-
 # http://ejabberd.jabber.ru/ejabberdctl-extra
 Source4:	http://ejabberd.jabber.ru/files/efiles/mod_ctlextra.erl
-
 # The following were extracted from a patch found on http://realloc.spb.ru/share/ejabberdad.html
 Source5:	ejabberd_auth_ad.erl
 Source6:	mod_shared_roster_ad.erl
 Source7:	mod_vcard_ad.erl
+# http://www.jabber.ru/bugzilla/show_bug.cgi?id=25
+Patch0:      %{name}-1.1.2-ldaps-support.patch
 BuildRequires:	erlang-stack
 BuildRequires:	erlang-devel
 BuildRequires:	libexpat-devel
@@ -42,9 +42,9 @@ Group:		System/Servers
 %description doc
 Documentation for ejabberd.
 
-
 %prep
 %setup -q
+%patch0 -p1 -b .ldaps
 
 %{__perl} -pi -e "s!/var/lib/ejabberd!%{_libdir}/ejabberd-%{version}!g" src/Makefile.in
 %{__perl} -pi -e "s!/etc!%{_sysconfdir}!g" src/Makefile.in
