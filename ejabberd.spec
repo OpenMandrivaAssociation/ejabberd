@@ -94,7 +94,7 @@ cat > %{buildroot}%{_sysconfdir}/logrotate.d/%{name} <<'EOF'
     create 0640 ejabberd ejabberd
     sharedscripts
     postrotate
-        runuser ejabberd -c "ejabberdctl --node ejabberd@`hostname -s` reopen-log >/dev/null 2>&1 || true
+        runuser ejabberd -c "ejabberdctl --node ejabberd@`hostname -s` reopen-log >/dev/null 2>&1" || true
     endscript
 }
 EOF
