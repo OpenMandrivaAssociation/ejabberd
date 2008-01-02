@@ -31,6 +31,7 @@ Requires(pre):	rpm-helper >= 0.19
 Requires(post):	rpm-helper >= 0.19
 Requires(preun):	rpm-helper >= 0.19
 Requires(postun):	rpm-helper >= 0.19
+BuildRoot:	    %{_tmppath}/%{name}-%{version}
 
 %description
 ejabberd is a Free and Open Source distributed fault-tolerant
