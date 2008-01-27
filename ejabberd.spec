@@ -29,7 +29,7 @@ Requires:	    erlang-base
 Requires:	    erlang-crypto
 Requires:	    erlang-mnesia
 Requires(pre):	rpm-helper >= 0.19
-Requires(post):	rpm-helper >= 0.19
+Requires(post):	rpm-helper >= 0.21
 Requires(preun):	rpm-helper >= 0.19
 Requires(postun):	rpm-helper >= 0.19
 BuildRoot:	    %{_tmppath}/%{name}-%{version}
@@ -193,7 +193,7 @@ fi
 %_preun_service ejabberd
 
 %post
-%create_ssl_certificate ejabberd  true ejabberd
+%_create_ssl_certificate ejabberd -b -g ejabberd
 %_post_service ejabberd
 
 %postun
