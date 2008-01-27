@@ -1,11 +1,13 @@
+%define beta rc1
+
 Name:		ejabberd
-Version:	1.1.4
-Release:    %mkrel 1
+Version:	2.0.0
+Release:    %mkrel 0.%{rc}.1
 Summary:	A distributed, fault-tolerant Jabber/XMPP server
 Group:		System/Servers
 License:	GPL
 URL:		http://ejabberd.jabber.ru/
-Source0:	http://www.process-one.net/en/projects/ejabberd/download/%{version}/ejabberd-%{version}.tar.bz2
+Source0:	http://www.process-one.net/en/projects/ejabberd/download/%{version}/ejabberd-%{version}-%{beta}.tar.gz
 Source1:	ejabberd.init
 Source3:	inetrc
 # http://ejabberd.jabber.ru/ejabberdctl-extra
@@ -14,9 +16,8 @@ Source4:	http://ejabberd.jabber.ru/files/efiles/mod_ctlextra.erl
 Source5:	ejabberd_auth_ad.erl
 Source6:	mod_shared_roster_ad.erl
 Source7:	mod_vcard_ad.erl
-# http://www.jabber.ru/bugzilla/show_bug.cgi?id=25
-Patch0:      %{name}-1.1.2-ldaps-support.patch
-BuildRequires:	erlang-stack
+BuildRequires:	erlang-base
+BuildRequires:	erlang-ssl
 BuildRequires:	erlang-devel
 BuildRequires:	libexpat-devel
 BuildRequires:	openssl-devel
@@ -48,7 +49,6 @@ Documentation for ejabberd.
 
 %prep
 %setup -q
-%patch0 -p1 -b .ldaps
 
 %{__perl} -pi -e "s!/var/lib/ejabberd!%{_libdir}/ejabberd-%{version}!g" src/Makefile.in
 %{__perl} -pi -e "s!/etc!%{_sysconfdir}!g" src/Makefile.in
@@ -124,45 +124,15 @@ You can also access the web console at http://host:5280/admin
 EOF
 
 install -d -m 755 %{buildroot}%{_docdir}/%{name}
+install -m 644 README %{buildroot}%{_docdir}/%{name}
 install -m 644 README.urpmi %{buildroot}%{_docdir}/%{name}
-install -m 644 TODO %{buildroot}%{_docdir}/%{name}
 install -m 644 ChangeLog %{buildroot}%{_docdir}/%{name}
 install -m 644 COPYING %{buildroot}%{_docdir}/%{name}
 install -m 644 doc/*.pdf doc/*.html doc/*.png doc/release_notes_*  %{buildroot}%{_docdir}/%{name}
 
-# wrappers
-cat > ejabberdctl <<'EOF'
-#!/bin/sh
-
-ERLANG_NODE=ejabberd
-ERL=/usr/bin/erl
-LIB=%{_libdir}/ejabberd-%{version}/ebin
-
-if [ -r /var/lib/ejabberd/.erlang.cookie ] ; then
-    export HOME=/var/lib/ejabberd
-fi
-
-if [ $# -ne 0 ] ; then
-    case $1 in
-	--node) shift ; ERLANG_NODE=$1 ; shift ;;
-    esac
-fi
-
-if [ "$ERLANG_NODE" = "${ERLANG_NODE%.*}" ] ; then
-    SNAME=-sname
-else
-    SNAME=-name
-fi
-
-exec $ERL -pa $LIB \
-    $SNAME ejabberdctl \
-    -s ejabberd_ctl \
-    -noinput \
-    -extra $ERLANG_NODE \
-    "$@"
-EOF
-
-cat > ejabberd <<'EOF'
+install -d -m 755 %{buildroot}%{_sbindir}
+# ejabberd wrapper
+cat > %{buildroot}%{_sbindir}/ejabberd <<'EOF'
 #!/bin/sh
 
 ERLANG_NODE=ejabberd
@@ -208,10 +178,9 @@ exec $ERL -pa $LIB \
     -mnesia dir \"$SPOOL\" \
     $ERL_OPTIONS $ARGS "$@"
 EOF
+chmod 755 %{buildroot}%{_sbindir}/ejabberd
 
-install -d -m 755 %{buildroot}%{_sbindir}
-install -m 755 ejabberd %{buildroot}%{_sbindir}
-install -m 755 ejabberdctl %{buildroot}%{_sbindir}
+mv  %{buildroot}/sbin/ejabberdctl %{buildroot}%{_sbindir}
 
 %pre
 if [ -d %{_localstatedir}/%{name}/spool ]; then
@@ -238,11 +207,12 @@ rm -rf %{buildroot}
 %dir %{_docdir}/%{name}
 %{_docdir}/%{name}/COPYING
 %{_docdir}/%{name}/ChangeLog
-%{_docdir}/%{name}/TODO
+%{_docdir}/%{name}/README
 %{_docdir}/%{name}/README.urpmi
 %dir %{_sysconfdir}/ejabberd
 %attr(640,root,ejabberd) %config(noreplace) %{_sysconfdir}/ejabberd/ejabberd.cfg
 %config(noreplace) %{_sysconfdir}/ejabberd/inetrc
+%config(noreplace) %{_sysconfdir}/ejabberd/ejabberdctl.cfg
 %{_initrddir}/ejabberd
 %{_sbindir}/ejabberd
 %{_sbindir}/ejabberdctl
@@ -256,5 +226,5 @@ rm -rf %{buildroot}
 %{_docdir}/%{name}
 %exclude %{_docdir}/%{name}/COPYING
 %exclude %{_docdir}/%{name}/ChangeLog
-%exclude %{_docdir}/%{name}/TODO
+%exclude %{_docdir}/%{name}/README
 %exclude %{_docdir}/%{name}/README.urpmi
