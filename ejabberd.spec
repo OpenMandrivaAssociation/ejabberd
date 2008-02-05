@@ -19,6 +19,9 @@ Source7:	mod_vcard_ad.erl
 BuildRequires:	erlang-base
 BuildRequires:	erlang-ssl
 BuildRequires:	erlang-devel
+BuildRequires:	erlang-erl_interface
+BuildRequires:	erlang-compiler
+BuildRequires:	erlang-asn1
 BuildRequires:	libexpat-devel
 BuildRequires:	openssl-devel
 BuildRequires:	zlib-devel
@@ -62,8 +65,9 @@ cp %{SOURCE7} src
 %build
 pushd src
 %configure2_5x \
-	--enable-odbc
-make
+	--enable-odbc 
+
+%make
 popd
 pushd doc
 make html pdf
