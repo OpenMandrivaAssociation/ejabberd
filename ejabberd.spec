@@ -2,7 +2,7 @@
 
 Name:		ejabberd
 Version:	2.0.0
-Release:    %mkrel 0.%{beta}.1
+Release:    %mkrel 0.%{beta}.2
 Summary:	A distributed, fault-tolerant Jabber/XMPP server
 Group:		System/Servers
 License:	GPL
@@ -27,7 +27,7 @@ BuildRequires:	openssl-devel
 BuildRequires:	zlib-devel
 BuildRequires:	tetex-latex
 BuildRequires:	hevea
-BuildRequires:  rpm-helper >= 0.19
+BuildRequires:  rpm-helper >= 0.21
 Requires:	    erlang-base
 Requires:	    erlang-crypto
 Requires:	    erlang-mnesia
