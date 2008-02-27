@@ -25,15 +25,15 @@ BuildRequires:	openssl-devel
 BuildRequires:	zlib-devel
 BuildRequires:	tetex-latex
 BuildRequires:	hevea
-BuildRequires:  rpm-helper >= 0.21
-Requires:	    erlang-base
-Requires:	    erlang-crypto
-Requires:	    erlang-mnesia
+BuildRequires:	rpm-helper >= 0.21
+Requires:	erlang-base
+Requires:	erlang-crypto
+Requires:	erlang-mnesia
 Requires(pre):	rpm-helper >= 0.19
 Requires(post):	rpm-helper >= 0.21
 Requires(preun):	rpm-helper >= 0.19
 Requires(postun):	rpm-helper >= 0.19
-BuildRoot:	    %{_tmppath}/%{name}-%{version}
+BuildRoot:	%{_tmppath}/%{name}-%{version}-buildroot
 
 %description
 ejabberd is a Free and Open Source distributed fault-tolerant
