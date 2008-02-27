@@ -1,13 +1,11 @@
-%define beta rc1
-
 Name:		ejabberd
 Version:	2.0.0
-Release:    %mkrel 0.%{beta}.2
+Release:	%mkrel 1
 Summary:	A distributed, fault-tolerant Jabber/XMPP server
 Group:		System/Servers
-License:	GPL
+License:	GPLv2+
 URL:		http://ejabberd.jabber.ru/
-Source0:	http://www.process-one.net/en/projects/ejabberd/download/%{version}/ejabberd-%{version}-%{beta}.tar.gz
+Source0:	http://www.process-one.net/en/projects/ejabberd/download/%{version}/ejabberd-%{version}.tar.gz
 Source1:	ejabberd.init
 Source3:	inetrc
 # http://ejabberd.jabber.ru/ejabberdctl-extra
