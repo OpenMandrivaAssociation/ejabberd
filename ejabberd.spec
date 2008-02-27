@@ -4,8 +4,8 @@ Release:	%mkrel 1
 Summary:	A distributed, fault-tolerant Jabber/XMPP server
 Group:		System/Servers
 License:	GPLv2+
-URL:		http://ejabberd.jabber.ru/
-Source0:	http://www.process-one.net/en/projects/ejabberd/download/%{version}/ejabberd-%{version}.tar.gz
+URL:		http://www.ejabberd.im/
+Source0:	http://www.process-one.net/downloads/ejabberd/%{version}/%{name}-%{version}.tar.gz
 Source1:	ejabberd.init
 Source3:	inetrc
 # http://ejabberd.jabber.ru/ejabberdctl-extra
