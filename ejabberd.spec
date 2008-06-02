@@ -83,7 +83,7 @@ chmod a+x %{buildroot}%{_libdir}/ejabberd-%{version}/priv/lib/*.so
     %{buildroot}/etc/ejabberd/ejabberd.cfg
 
 install -d -m 755 %{buildroot}/var/log/ejabberd
-install -d -m 755 %{buildroot}%{_localstatedir}/ejabberd
+install -d -m 755 %{buildroot}%{_localstatedir}/lib/ejabberd
 
 install -d -m 755  %{buildroot}%{_initrddir}
 install -m 755 %{SOURCE1} %{buildroot}%{_initrddir}/ejabberd
@@ -185,9 +185,9 @@ chmod 755 %{buildroot}%{_sbindir}/ejabberd
 mv  %{buildroot}/sbin/ejabberdctl %{buildroot}%{_sbindir}
 
 %pre
-if [ -d %{_localstatedir}/%{name}/spool ]; then
-    mv -f %{_localstatedir}/%{name}/spool/* %{_localstatedir}/%{name}
-    rmdir %{_localstatedir}/%{name}/spool
+if [ -d %{_localstatedir}/lib/%{name}/spool ]; then
+    mv -f %{_localstatedir}/lib/%{name}/spool/* %{_localstatedir}/lib/%{name}
+    rmdir %{_localstatedir}/lib/%{name}/spool
 fi
 %_pre_useradd ejabberd /var/lib/ejabberd /bin/sh
 
