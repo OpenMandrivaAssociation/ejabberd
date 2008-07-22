@@ -61,13 +61,14 @@ cp %{SOURCE6} src
 cp %{SOURCE7} src
 
 %build
+%define _disable_ld_no_undefined 1
 pushd src
 %configure2_5x \
 	--enable-odbc \
 	--disable-pam \
 	--disable-ejabberd_zlib
 
-%make
+%make -j1
 popd
 pushd doc
 make html pdf
@@ -79,13 +80,13 @@ pushd src
 %makeinstall_std
 popd
 
-chmod a+x %{buildroot}%{_libdir}/ejabberd-%{version}/priv/lib/*.so
+chmod a+x %{buildroot}%{_var}/lib/ejabberd/priv/lib/*.so
 
 %{__perl} -pi -e 's!./ssl.pem!/etc/pki/tls/private/ejabberd.pem!g' \
     %{buildroot}/etc/ejabberd/ejabberd.cfg
 
 install -d -m 755 %{buildroot}/var/log/ejabberd
-install -d -m 755 %{buildroot}%{_localstatedir}/lib/ejabberd
+install -d -m 755 %{buildroot}%{_var}/lib/ejabberd
 
 install -d -m 755  %{buildroot}%{_initrddir}
 install -m 755 %{SOURCE1} %{buildroot}%{_initrddir}/ejabberd
@@ -141,7 +142,7 @@ cat > %{buildroot}%{_sbindir}/ejabberd <<'EOF'
 
 ERLANG_NODE=ejabberd
 ERL=/usr/bin/erl
-LIB=%{_libdir}/ejabberd-%{version}/ebin
+LIB=%{_var}/lib/ejabberd/ebin
 CONFIG=/etc/ejabberd/ejabberd.cfg
 INETRC=/etc/ejabberd/inetrc
 LOG=/var/log/ejabberd/ejabberd.log
@@ -184,12 +185,10 @@ exec $ERL -pa $LIB \
 EOF
 chmod 755 %{buildroot}%{_sbindir}/ejabberd
 
-mv  %{buildroot}/sbin/ejabberdctl %{buildroot}%{_sbindir}
-
 %pre
-if [ -d %{_localstatedir}/lib/%{name}/spool ]; then
-    mv -f %{_localstatedir}/lib/%{name}/spool/* %{_localstatedir}/lib/%{name}
-    rmdir %{_localstatedir}/lib/%{name}/spool
+if [ -d %{_var}/lib/%{name}/spool ]; then
+    mv -f %{_var}/lib/%{name}/spool/* %{_var}/lib/%{name}
+    rmdir %{_var}/lib/%{name}/spool
 fi
 %_pre_useradd ejabberd /var/lib/ejabberd /bin/sh
 
@@ -221,7 +220,6 @@ rm -rf %{buildroot}
 %{_sbindir}/ejabberd
 %{_sbindir}/ejabberdctl
 %config(noreplace) %{_sysconfdir}/logrotate.d/ejabberd
-%{_libdir}/ejabberd-%{version}
 %attr(-,ejabberd,ejabberd) /var/lib/ejabberd
 %attr(-,ejabberd,ejabberd) /var/log/ejabberd
 
