@@ -1,6 +1,6 @@
 Name:		ejabberd
 Version:	2.0.1
-Release:	%mkrel 1
+Release:	%mkrel 2
 Summary:	A distributed, fault-tolerant Jabber/XMPP server
 Group:		System/Servers
 License:	GPLv2+
