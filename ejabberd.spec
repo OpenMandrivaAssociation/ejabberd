@@ -1,11 +1,11 @@
-Name:		ejabberd
-Version:	2.0.1
-Release:	%mkrel 2
 Summary:	A distributed, fault-tolerant Jabber/XMPP server
+Name:		ejabberd
+Version:	2.0.2
+Release:	%mkrel 1
 Group:		System/Servers
 License:	GPLv2+
 URL:		http://www.ejabberd.im/
-Source0:	http://www.process-one.net/downloads/ejabberd/%{version}/%{name}-%{version}_2.tar.gz
+Source0:	http://www.process-one.net/downloads/ejabberd/%{version}/%{name}-%{version}.tar.gz
 Source1:	ejabberd.init
 Source3:	inetrc
 # http://ejabberd.jabber.ru/ejabberdctl-extra
