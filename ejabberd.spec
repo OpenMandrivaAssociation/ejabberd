@@ -1,7 +1,7 @@
 Summary:	A distributed, fault-tolerant Jabber/XMPP server
 Name:		ejabberd
 Version:	2.0.2
-Release:	%mkrel 1
+Release:	%mkrel 2
 Group:		System/Servers
 License:	GPLv2+
 URL:		http://www.ejabberd.im/
@@ -29,6 +29,8 @@ BuildRequires:	rpm-helper >= 0.21
 Requires:	erlang-base
 Requires:	erlang-crypto
 Requires:	erlang-mnesia
+Requires:	erlang-syntax_tools
+Requires:	erlang-compiler
 Requires(pre):	rpm-helper >= 0.19
 Requires(post):	rpm-helper >= 0.21
 Requires(preun):	rpm-helper >= 0.19
