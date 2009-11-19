@@ -1,7 +1,7 @@
 Summary:	A distributed, fault-tolerant Jabber/XMPP server
 Name:		ejabberd
-Version:	2.0.5
-Release:	%mkrel 2
+Version:	2.1.0
+Release:	%mkrel 1
 Group:		System/Servers
 License:	GPLv2+
 URL:		http://www.ejabberd.im/
@@ -45,6 +45,15 @@ Jabber/XMPP server. It is mostly written in Erlang, and runs on many
 platforms (tested on Linux, FreeBSD, NetBSD, Solaris, Mac OS X and
 Windows NT/2000/XP).
 
+%package devel
+Summary:	Development files for %{name}
+Group:		Development/Other
+Requires:	%{name} = %{version}-%{release}
+Requires:	erlang-devel
+
+%description devel
+Development files for %{name}.
+
 %package doc
 Summary:	Documentation for ejabberd
 Group:		System/Servers
@@ -57,7 +66,6 @@ Documentation for ejabberd.
 
 %{__perl} -pi -e "s!/var/lib/ejabberd!%{_libdir}/ejabberd-%{version}!g" src/Makefile.in
 %{__perl} -pi -e "s!/etc!%{_sysconfdir}!g" src/Makefile.in
-%{__perl} -pi -e "s!\@prefix\@!!g" src/Makefile.in
 
 cp %{SOURCE4} src
 cp %{SOURCE5} src
@@ -84,7 +92,7 @@ pushd src
 %makeinstall_std
 popd
 
-chmod a+x %{buildroot}%{_var}/lib/ejabberd/priv/lib/*.so
+chmod a+x %{buildroot}%{_libdir}/ejabberd/priv/lib/
 
 %{__perl} -pi -e 's!./ssl.pem!/etc/pki/tls/private/ejabberd.pem!g' \
     %{buildroot}/etc/ejabberd/ejabberd.cfg
@@ -135,7 +143,6 @@ EOF
 install -d -m 755 %{buildroot}%{_docdir}/%{name}
 install -m 644 README %{buildroot}%{_docdir}/%{name}
 install -m 644 README.urpmi %{buildroot}%{_docdir}/%{name}
-install -m 644 ChangeLog %{buildroot}%{_docdir}/%{name}
 install -m 644 COPYING %{buildroot}%{_docdir}/%{name}
 install -m 644 doc/*.pdf doc/*.html doc/*.png doc/release_notes_*  %{buildroot}%{_docdir}/%{name}
 
@@ -213,7 +220,6 @@ rm -rf %{buildroot}
 %defattr(-,root,root)
 %dir %{_docdir}/%{name}
 %{_docdir}/%{name}/COPYING
-%{_docdir}/%{name}/ChangeLog
 %{_docdir}/%{name}/README
 %{_docdir}/%{name}/README.urpmi
 %dir %{_sysconfdir}/ejabberd
@@ -223,14 +229,22 @@ rm -rf %{buildroot}
 %{_initrddir}/ejabberd
 %{_sbindir}/ejabberd
 %{_sbindir}/ejabberdctl
+%dir %{_libdir}/ejabberd
+%dir %{_libdir}/ejabberd/ebin
+%dir %{_libdir}/ejabberd/priv
+%{_libdir}/ejabberd/ebin/*
+%{_libdir}/ejabberd/priv/*
 %config(noreplace) %{_sysconfdir}/logrotate.d/ejabberd
 %attr(-,ejabberd,ejabberd) /var/lib/ejabberd
 %attr(-,ejabberd,ejabberd) /var/log/ejabberd
+
+%files devel
+%defattr(-,root,root)
+%{_libdir}/ejabberd/include
 
 %files doc
 %defattr(-,root,root)
 %{_docdir}/%{name}
 %exclude %{_docdir}/%{name}/COPYING
-%exclude %{_docdir}/%{name}/ChangeLog
 %exclude %{_docdir}/%{name}/README
 %exclude %{_docdir}/%{name}/README.urpmi
