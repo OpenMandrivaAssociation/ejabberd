@@ -1,7 +1,7 @@
 Summary:	A distributed, fault-tolerant Jabber/XMPP server
 Name:		ejabberd
 Version:	2.1.2
-Release:	%mkrel 2
+Release:	%mkrel 3
 Group:		System/Servers
 License:	GPLv2+
 URL:		http://www.ejabberd.im/
@@ -202,6 +202,7 @@ if [ -d %{_var}/lib/%{name}/spool ]; then
     rmdir %{_var}/lib/%{name}/spool
 fi
 %_pre_useradd ejabberd /var/lib/ejabberd /bin/sh
+%_pre_groupadd ejabberd ejabberd
 
 %preun
 %_preun_service ejabberd
@@ -212,6 +213,7 @@ fi
 
 %postun
 %_postun_userdel ejabberd
+%_postun_groupdel ejabberd
 
 %clean
 rm -rf %{buildroot}
@@ -222,7 +224,7 @@ rm -rf %{buildroot}
 %{_docdir}/%{name}/COPYING
 %{_docdir}/%{name}/README
 %{_docdir}/%{name}/README.urpmi
-%dir %{_sysconfdir}/ejabberd
+%dir %attr(750,root,ejabberd) %{_sysconfdir}/ejabberd
 %attr(640,root,ejabberd) %config(noreplace) %{_sysconfdir}/ejabberd/ejabberd.cfg
 %attr(640,root,ejabberd) %config(noreplace) %{_sysconfdir}/ejabberd/inetrc
 %attr(640,root,ejabberd) %config(noreplace) %{_sysconfdir}/ejabberd/ejabberdctl.cfg
