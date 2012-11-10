@@ -1,0 +1,8 @@
+sources:
+  "ejabberd-2.1.10.tar.gz:"	c1164aa00f4445cc464cc57a986cf2607315635b
+  "ejabberd_auth_ad.erl:"	cf677ca9c0111b2385147e3948a2c088161c76ba
+  "ejabberd.init:"	9cbb02f1d77bd78196bd41856a1d45050e92efd0
+  "inetrc:"	1e0bae0f7251e2ae3b62ba9d3e5cc86bb5dd271e
+  "mod_ctlextra.erl:"	1c5c931f1739fff77d47ccfd14fed7ac44349379
+  "mod_shared_roster_ad.erl:"	bd28d141d7aa52733329967fab4feb6996949d8e
+  "mod_vcard_ad.erl:"	ef35a681ef609d137a19f9d4d2511fc59f91e5a5

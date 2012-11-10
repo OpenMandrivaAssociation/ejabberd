@@ -1,0 +1,7 @@
+ejabberd-2.1.10.tar.gz
+ejabberd_auth_ad.erl
+ejabberd.init
+inetrc
+mod_ctlextra.erl
+mod_shared_roster_ad.erl
+mod_vcard_ad.erl
