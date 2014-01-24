@@ -1,11 +1,11 @@
 Summary:	A distributed, fault-tolerant Jabber/XMPP server
 Name:		ejabberd
-Version:	2.1.11
+Version:	2.1.13
 Release:	1
 Group:		System/Servers
 License:	GPLv2+
 URL:		http://www.ejabberd.im/
-source0:	https://github.com/processone/ejabberd/archive/%{name}-%{version}.tar.bz2
+Source0:	https://github.com/processone/ejabberd/archive/%{name}-%{version}.tar.gz
 Source1:	ejabberd.init
 Source3:	inetrc
 # http://ejabberd.jabber.ru/ejabberdctl-extra
@@ -26,8 +26,8 @@ BuildRequires:	zlib-devel
 BuildRequires:	tetex-latex
 BuildRequires:	hevea
 BuildRequires:	rpm-helper >= 0.21
-buildrequires:	erlang-public_key
-buildrequires:	erlang-parsetools
+BuildRequires:	erlang-public_key
+BuildRequires:	erlang-parsetools
 Requires:	erlang-base
 Requires:	erlang-crypto
 Requires:	erlang-mnesia

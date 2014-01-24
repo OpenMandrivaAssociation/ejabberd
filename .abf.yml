@@ -1,2 +1,4 @@
-sources:
+removed_sources:
   ejabberd-2.1.11.tar.bz2: 66cc51524f4d9b25981596b97a40328d992d9d8d
+sources:
+  ejabberd-2.1.13.tar.gz: 6343186be2e84824d2da32e36110b72d6673730e
