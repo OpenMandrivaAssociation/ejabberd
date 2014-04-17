@@ -1,92 +1,111 @@
-#!/bin/sh
+#!/bin/bash
 #
-# chkconfig: 345 70 30
-# description: ejabberd is a Jabber (XMPP) instant messaging system server
+# ejabberd    Start and stop ejabberd.
+
+# chkconfig: - 40 60
+# description: ejabberd
+# processname: ejabberd
+# pidfile: /var/run/ejabberd.pid
 
 ### BEGIN INIT INFO
 # Provides: ejabberd
-# Required-Start: $network
-# Required-Stop: $network
+# Required-Start: network
+# Required-Stop: network
 # Default-Start: 3 4 5
-# Short-Description: ejabberd is a Jabber (XMPP) instant messaging system server
-# Description: This startup script launches ejabberd, a instant messaging system server using xmpp.
+# Default-Stop: 0 1 6
+# Short-Description: Start and stop ejabberd
+# Description: A distributed, fault-tolerant Jabber/XMPP server
 ### END INIT INFO
 
-# Source function library
 . /etc/rc.d/init.d/functions
 
-# Set defaults and read configuration
-NAME=ejabberd
-LOCKFILE=/var/lock/subsys/$NAME
-
-[ -f /etc/sysconfig/ejabberd ] && . /etc/sysconfig/ejabberd
+if [ -r /etc/sysconfig/ejabberd ]; then
+	. /etc/sysconfig/ejabberd
+fi
 
 if [ ! "$CONFIG_FILE" ]; then
-    CONFIG_FILE=/etc/ejabberd/ejabberd.cfg
-fi 
+	CONFIG_FILE=/etc/ejabberd/ejabberd.cfg
+fi
+
+# we're using symlinked consolehelper to check user's rights
+progctl=/usr/bin/ejabberdctl
 
 start() {
-    res=0
-    if [ ! -f $LOCKFILE ]; then
-	echo -n "Starting $NAME:"
-	daemon /usr/sbin/ejabberdctl start --config $CONFIG_FILE \
-	 	--ctl-config /etc/ejabberd/ejabberdctl.cfg \
-	 	--logs "/var/log/ejabberd" \
-	 	--spool "/var/lib/ejabberd/spool" 2>/dev/null
+        echo -n $"Starting ejabberd: "
+	if [ "$ULIMIT_MAX_FILES" ]; then
+		ulimit -n $ULIMIT_MAX_FILES
+	fi
 
-	res=$?
-	[ $res -eq 0 ] && touch $LOCKFILE
-	echo
-    fi
-    return $res
+	# check whether ejabberd was already started
+	if $progctl status > /dev/null 2>&1 ; then
+		echo -n "already running" && warning && echo
+		return 0
+	fi
+
+	daemon $progctl start	--config $CONFIG_FILE \
+				--ctl-config /etc/ejabberd/ejabberdctl.cfg \
+				--logs "/var/log/ejabberd" \
+				--spool "/var/lib/ejabberd/spool" \
+				2>/dev/null
+        RETVAL=$?
+        [ $RETVAL -eq 0 ] && touch /var/lock/subsys/ejabberd
+        echo
+
+	# it takes some time to actually start necessary nodes
+	sleep 5
+
+        return $RETVAL
 }
 
 stop() {
-    echo -n "Stopping $NAME:"
-    daemon /usr/sbin/ejabberdctl stop 2>/dev/null
-    res=$?
-    if [ $res -eq 0 ]; then
-	success
-       	rm -f $LOCKFILE
-    else
-	failure
-    fi
-    echo
-    return $res
-}
+        # Stop daemons.
+        echo -n "Shutting down ejabberd: "
 
-ejabberd_status() {
-    su ejabberd -c "ejabberdctl --node ejabberd@`hostname -s` status"
+	# check whether ejabberd was already stopped
+	if ! $progctl status > /dev/null 2>&1 ; then
+		echo -n "already stopped" && warning && echo
+		return 0
+	fi
+
+	daemon $progctl stop 2>/dev/null
+        RETVAL=$?
+        [ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/ejabberd
+        echo
+
+	# it takes some time to actually stop necessary nodes
+	sleep 5
+
+        return $RETVAL
 }
 
 restart() {
-    stop
-    start
+        stop
+	sleep 5
+        start
 }
 
 # See how we were called.
 case "$1" in
-    start)
+  start)
         start
         ;;
-    stop)
+  stop)
         stop
         ;;
-    reload|restart)
+  restart|force-reload)
         restart
         ;;
-    condreload|condrestart)
-	if [ -f $LOCKFILE ]; then
-	    restart
-	fi
+  condrestart|try-restart)
+        [ -f /var/lock/subsys/ejabberd ] && restart || :
         ;;
-    status)
-        ejabberd_status
+  status)
+	$progctl status
         ;;
-    *)
-        echo "Usage: $0 {start|stop|restart|reload|condrestart|condreload|status}"
-        exit 1
-	;;
+  *)
+        echo "Usage: ejabberd {start|stop|restart|force-reload|condrestart|try-restart|status}"
+        exit 2
 esac
 
 exit $?
+
+

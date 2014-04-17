@@ -1,0 +1,26 @@
+From 72718b8fcbb19b34e348efcb874fa480e83d7a02 Mon Sep 17 00:00:00 2001
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Tue, 16 Feb 2010 16:03:38 +0300
+Subject: [PATCH 01/11] Fix PAM service example name to match actual one
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ src/ejabberd.cfg.example | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/ejabberd.cfg.example b/src/ejabberd.cfg.example
+index a4068ad..9b24a4a 100644
+--- a/src/ejabberd.cfg.example
++++ b/src/ejabberd.cfg.example
+@@ -243,7 +243,7 @@
+ %% Authentication using PAM
+ %%
+ %%{auth_method, pam}.
+-%%{pam_service, "pamservicename"}.
++%%{pam_service, "ejabberd"}.
+ 
+ %%
+ %% Authentication using LDAP
+-- 
+1.7.11.5
+

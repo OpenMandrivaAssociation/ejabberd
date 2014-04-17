@@ -1,0 +1,26 @@
+From 924dab202126d7644a8e50e81d1b2de21875bb7f Mon Sep 17 00:00:00 2001
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Sat, 12 Jun 2010 14:14:52 +0400
+Subject: [PATCH 05/11] Install *.so objects with 0755 permissions
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ src/Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/Makefile.in b/src/Makefile.in
+index 42af5b2..64ed856 100644
+--- a/src/Makefile.in
++++ b/src/Makefile.in
+@@ -237,7 +237,7 @@ install: all
+ 	#
+ 	# Binary system libraries
+ 	install -d $(SODIR)
+-	install -m 644 *.so $(SODIR)
++	install -m 755 *.so $(SODIR)
+ 	#
+ 	# Translated strings
+ 	install -d $(MSGSDIR)
+-- 
+1.7.11.5
+

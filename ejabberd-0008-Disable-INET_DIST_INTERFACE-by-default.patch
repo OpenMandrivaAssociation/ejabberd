@@ -1,0 +1,26 @@
+From a6a1ee5a9d5a8400415a96456dbb79f4341c3410 Mon Sep 17 00:00:00 2001
+From: Peter Lemenkov <lemenkov@gmail.com>
+Date: Sat, 18 Jun 2011 23:24:28 +0400
+Subject: [PATCH 08/11] Disable INET_DIST_INTERFACE by default
+
+Signed-off-by: Peter Lemenkov <lemenkov@gmail.com>
+---
+ src/ejabberdctl.cfg.example | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/ejabberdctl.cfg.example b/src/ejabberdctl.cfg.example
+index b72058a..5ee43cf 100644
+--- a/src/ejabberdctl.cfg.example
++++ b/src/ejabberdctl.cfg.example
+@@ -59,7 +59,7 @@
+ #
+ # Default: {127,0,0,1}
+ #
+-INET_DIST_INTERFACE={127,0,0,1}
++#INET_DIST_INTERFACE={127,0,0,1}
+ 
+ #.
+ #' ERL_EPMD_ADDRESS: IP addresses where epmd listens for connections
+-- 
+1.7.11.5
+
