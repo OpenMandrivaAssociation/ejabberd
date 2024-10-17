@@ -5,7 +5,7 @@ Version:	2.1.13
 Release:	5
 Group:		System/Servers
 License:	GPLv2+
-URL:		http://www.ejabberd.im/
+URL:		https://www.ejabberd.im/
 Source0:	http://www.process-one.net/downloads/ejabberd/%{version}/%{name}-%{version}.tgz
 Source3:        inetrc
 # http://ejabberd.jabber.ru/ejabberdctl-extra
