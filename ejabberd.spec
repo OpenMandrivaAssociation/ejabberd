@@ -43,6 +43,11 @@ Patch7: ejabberd-0007-Support-SASL-GSSAPI-authentication-thanks-to-Mikael-.patch
 # Disable IP restriction for ejabberdctl (seems that it doesn't work well)
 Patch8: ejabberd-0008-Disable-INET_DIST_INTERFACE-by-default.patch
 
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	libtool-base
+BuildRequires:	slibtool
+BuildRequires:	make
 BuildRequires:	erlang-base
 BuildRequires:	erlang-ssl
 BuildRequires:	erlang-devel
